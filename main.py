@@ -1,14 +1,20 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from wtforms import EmailField, PasswordField, StringField
+from wtforms.validators import DataRequired
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'any-secret-key-you-choose'
+app.config['SECRET_KEY'] = 'bka,rc.idaobacgkxapuds'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# class Registration(FlaskForm):
+#     email = 
 
 ##CREATE TABLE IN DB
 class User(UserMixin, db.Model):
