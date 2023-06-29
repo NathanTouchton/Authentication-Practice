@@ -1,10 +1,8 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
-from wtforms import EmailField, PasswordField, StringField
-from wtforms.validators import DataRequired
+
 
 app = Flask(__name__)
 
@@ -22,8 +20,15 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(1000))
-#Line below only required once, when creating DB. 
-# db.create_all()
+
+    def __init__(self, email, password, name):
+        self.email = email
+        self.password = password
+        self.name = name
+
+#Lines below only required once, when creating DB. 
+# with app.app_context():
+#     db.create_all()
 
 
 @app.route('/')
@@ -31,8 +36,23 @@ def home():
     return render_template("index.html")
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        with app.app_context():
+            new_user_dict = {
+                "email": request.form["email"],
+                "password": request.form["password"],
+                "name": request.form["name"],
+            }
+            new_user = User(
+                email=new_user_dict["email"],
+                password=new_user_dict["password"],
+                name=new_user_dict["password"],
+            )
+            db.session.add(new_user)
+            db.session.commit()
+
     return render_template("register.html")
 
 
@@ -54,7 +74,3 @@ def logout():
 @app.route('/download')
 def download():
     pass
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
