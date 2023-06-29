@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory
+from flask import Flask, render_template, request, url_for, redirect, flash, send_from_directory, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
@@ -48,10 +48,12 @@ def register():
             new_user = User(
                 email=new_user_dict["email"],
                 password=new_user_dict["password"],
-                name=new_user_dict["password"],
+                name=new_user_dict["name"],
             )
             db.session.add(new_user)
             db.session.commit()
+            session["name"] = new_user_dict["name"]
+        return redirect(url_for("secrets"))
 
     return render_template("register.html")
 
@@ -63,7 +65,9 @@ def login():
 
 @app.route('/secrets')
 def secrets():
-    return render_template("secrets.html")
+    # Greets user by name and gives them access to cheat_sheet.pdf
+    name = session.get("name")
+    return render_template("secrets.html", name=name)
 
 
 @app.route('/logout')
@@ -73,4 +77,6 @@ def logout():
 
 @app.route('/download')
 def download():
-    pass
+    return send_from_directory(
+        directory="static", path="files/cheat_sheet.pdf"
+    )
