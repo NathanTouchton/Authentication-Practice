@@ -11,9 +11,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# class Registration(FlaskForm):
-#     email = 
-
 ##CREATE TABLE IN DB
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,13 +30,16 @@ class User(UserMixin, db.Model):
 
 @app.route('/')
 def home():
+    """Renders homepage."""
     return render_template("index.html")
 
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
+    """This is the registration page. Adds user to database."""
     if request.method == "POST":
         with app.app_context():
+            # Creates dictionary from the form data in register.html, and adds it to the database.
             new_user_dict = {
                 "email": request.form["email"],
                 "password": request.form["password"],
