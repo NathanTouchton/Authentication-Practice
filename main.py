@@ -5,6 +5,8 @@ from flask_login import UserMixin, login_user, LoginManager, login_required, cur
 
 
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 app.config['SECRET_KEY'] = 'bka,rc.idaobacgkxapuds'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -23,7 +25,11 @@ class User(UserMixin, db.Model):
         self.password = password
         self.name = name
 
-#Lines below only required once, when creating DB. 
+@login_manager.user_loader
+def user_loader(user_id):
+    return User.query.get(int(user_id))
+
+#Lines below only required once, when creating DB.
 # with app.app_context():
 #     db.create_all()
 
@@ -42,7 +48,10 @@ def register():
             # Creates dictionary from the form data in register.html, and adds it to the database.
             new_user_dict = {
                 "email": request.form["email"],
-                "password": request.form["password"],
+                "password": generate_password_hash(
+                    password=request.form["password"],
+                    salt_length=16
+                ),
                 "name": request.form["name"],
             }
             new_user = User(
