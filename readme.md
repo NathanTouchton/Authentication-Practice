@@ -1,0 +1,1 @@
+A project for learning authentication with flask. I will probably not finish this since I'm really not liking flask at all, and I want to learn Django instead.
